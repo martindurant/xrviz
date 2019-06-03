@@ -30,12 +30,10 @@ class Describe(SigSlot):
                                                 "templates")
         self._template_env = Environment(loader=FileSystemLoader(self._template_load_path))
         self._variable_template = self._template_env.get_template('variable.html')
-        self._coordinate_template = self._template_env.get_template('coordinate.html')
-        self._dimension_template = self._template_env.get_template('dimension.html')
-        self._attribute_template = self._template_env.get_template('attribute.html')
 
     def variable_pane(self, var):
         if var is not None:
+            var = var[0]
             self.var_name = self.data[var].name
             var_dtype = str(self.data[var].dtype)
             var_size = self.data[var].size
@@ -56,26 +54,5 @@ class Describe(SigSlot):
         else:
             return self._variable_template.render(var=None)
 
-    def attribute_pane(self):
-        attrs = [(k, v) for k, v in self.data.attrs.items()]
-        return self._attribute_template.render(attrs=attrs)
-
-    def coordinate_pane(self):
-        coords = [coord for coord in self.data.coords.keys()]
-        return self._coordinate_template.render(coords=coords)
-
-    def dimension_pane(self):
-        dims = [(k, v) for k, v in self.data.dims.items()]
-        return self._dimension_template.render(dims=dims)
-
-    def setup(self, selected_property, sub_property):
-        if selected_property == 'Attributes':
-            self.panel.object = self.attribute_pane()
-        elif selected_property == 'Coordinates':
-            self.panel.object = self.coordinate_pane()
-        elif selected_property == 'Dimensions':
-            self.panel.object = self.dimension_pane()
-        elif selected_property == 'Variables':
-            self.panel.object = self.variable_pane(sub_property)
-        else:
-            self.panel.object = str(selected_property) + " : " + str(sub_property)
+    def setup(self, var):
+        self.panel.object = self.variable_pane(var)
